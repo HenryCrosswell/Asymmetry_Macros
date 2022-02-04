@@ -1,0 +1,15 @@
+selectWindow("q");
+roiManager("Select", 0);
+run("Duplicate...", "duplicate");
+selectWindow("q");
+roiManager("Select", 1);
+run("Duplicate...", "duplicate");
+selectWindow("q");
+roiManager("Select", 2);
+run("Duplicate...", "duplicate");
+selectWindow("q");
+roiManager("Select", 3);
+run("Duplicate...", "duplicate");
+selectWindow("q");
+roiManager("Select", 4);
+run("Duplicate...", "duplicate");
