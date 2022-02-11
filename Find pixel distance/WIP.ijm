@@ -167,7 +167,7 @@ run("Remove Outliers...", "radius=10 threshold=50 which=Dark stack");
 waitForUser("Make sure registered time point image is selected");
 
 
-
+run("Invert LUT");
 run("Duplicate...", "title=BothNF duplicate");
 run("Duplicate...", "title=NF1-Edge duplicate frames=1");
 selectWindow("BothNF");
