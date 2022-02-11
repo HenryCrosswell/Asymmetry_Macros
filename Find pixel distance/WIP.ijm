@@ -2,7 +2,7 @@
 //Make sure important results and ROI's are saved and cleared
 //Z sum project of the shaved NE, creates seperate images to be manipulated
 
-setBatchMode("hide");
+
 
 run("Duplicate...", "title=Original duplicate");
 selectWindow("Original");
@@ -10,13 +10,13 @@ run("Duplicate...", "title=AOriginal duplicate");
 run("Z Project...", "projection=[Sum Slices]");
 run("Set Measurements...", "area redirect=None decimal=4");
 
-setBatchMode("show");
+
 
 //Selection of Zippering point, returns the value into the next section
 setTool("point");
 waitForUser("Point selection", "When a Zippering point is selected, Click 'OK'");
 
-setBatchMode("hide");
+
 
 s = selectionType();
 if( s == -1 ) {
@@ -33,6 +33,8 @@ run("Select None");
 //In a SUM-projected image oriented ZP on left, tail on right
 //This Macro tessallates polygons from the ZP down the image and adds to ROI manager.
 By = 0;
+
+setBatchMode(true);
 
 run("Set Measurements...", "mean redirect=None decimal=1");
 
@@ -99,7 +101,7 @@ break;
 }
 
 }
-
+setBatchMode(false);
 
 selectWindow("Parent");
 roiManager("Add");
@@ -149,7 +151,7 @@ run("Concatenate...", "  title=[Cat image] open image1=LeftNF image2=RightNF");
 run("Correct 3D drift");
 close("Cat image");
 
-setBatchMode("show");
+
 
 waitForUser("Save this image as 'embryo' - registered time points");
 
@@ -164,7 +166,7 @@ run("Remove Outliers...", "radius=10 threshold=50 which=Dark stack");
 
 waitForUser("Make sure registered time point image is selected");
 
-setBatchMode("hide");
+
 
 run("Duplicate...", "title=BothNF duplicate");
 run("Duplicate...", "title=NF1-Edge duplicate frames=1");
@@ -194,6 +196,6 @@ selectWindow("NF1-DM");
 close();
 imageCalculator("Add create 32-bit stack", "Result of NF2-Edge", "NF1-Edge");
 
-setBatchMode("exit and display");
+
 
 selectWindow("Result of Result of NF2-Edge");
