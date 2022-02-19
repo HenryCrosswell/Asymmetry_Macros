@@ -188,13 +188,13 @@ selectWindow("NF2-DM");
 run("Distance Map", "stack");
 imageCalculator("Multiply create 32-bit stack", "NF1-Edge","NF2-DM");
 selectWindow("NF2-DM");
-close();
+//close();
 imageCalculator("Multiply create 32-bit stack", "NF2-Edge","NF1-DM");
 selectWindow("NF2-Edge");
-close();
+//close();
 selectWindow("NF1-DM");
-close();
-imageCalculator("Add create 32-bit stack", "Result of NF2-Edge", "NF1-Edge");
+//close();
+//imageCalculator("Add create 32-bit stack", "Result of NF2-Edge", "NF1-Edge");
 
 
 
