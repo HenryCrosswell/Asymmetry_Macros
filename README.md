@@ -24,7 +24,6 @@ To count individual selections pHH3 counts to calculate total cell counts in the
 
 To develop a heatmap of percentage deviation:
 1. Run "Combined - Find percentage deviation" on a shaved neural fold image
-2. when this macro finishes, run deviation map from tesslated linesV2
 2. Save resulting image (values represent percentage diversion)
 
 To calculate difference in 3D pixel distance
