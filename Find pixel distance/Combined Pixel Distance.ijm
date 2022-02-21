@@ -1,23 +1,22 @@
 
 //Make sure important results and ROI's are saved and cleared
 
-//Z sum project of the shaved NE, creates seperate images to be manipulated
+//Produces a Z sum project- oriented ZP on left, tail on right - of the shaved NE and creates seperate images to be manipulated
 
 setBatchMode("hide");
-run("Duplicate...", "title=Original duplicate");
+run("Duplicate...", "title=Original duplicate"); //Original will be the main target for manipulation
 selectWindow("Original");
-run("Duplicate...", "title=AOriginal duplicate");
+run("Duplicate...", "title=AOriginal duplicate"); //This image will be used for the rotation calculation
 run("Z Project...", "projection=[Sum Slices]");
 run("Set Measurements...", "area redirect=None decimal=4");
 
-
-
 //Selection of Zippering point, returns the value into the next section
+//Makes sure the zippering point was selected
+
 setBatchMode("show");
 setTool("point");
 waitForUser("Point selection", "When a Zippering point is selected, Click 'OK'");
 setBatchMode("hide");
-
 
 s = selectionType();
 if( s == -1 ) {
@@ -31,20 +30,19 @@ if( s == -1 ) {
 setTool("multipoint");
 run("Select None");
 
-//In a SUM-projected image oriented ZP on left, tail on right
-//This Macro tessallates polygons from the ZP down the image and adds to ROI manager.
-By = 0;
+//This tessallates polygons from the ZP down the image and adds to ROI manager.
 
+counts = 0;
 run("Set Measurements...", "mean redirect=None decimal=1");
-
-while(By < getHeight()) {
-	By = By+1;
-makePolygon(0,ZPY,getWidth(),By,getWidth(),0,0,0);
+while(counts < getHeight()) {
+	counts = counts+1;
+makePolygon(0,ZPY,getWidth(),counts,getWidth(),0,0,0);
 roiManager("Add");
 }
 
 
 //Duplicate images to clear inside and outside the polygon
+
 run("Duplicate...", "title=Parent");
 run("Duplicate...", "title=ClearIn");
 selectWindow("Parent");
@@ -53,6 +51,7 @@ run("Duplicate...", "title=ClearOut");
 
 //Check whether the area outside the polygon is larger than inside in each ROI. 
 //Stop when outside is smaller
+
 r = roiManager("count");
 for (i=0; i<r; i++) {
  	showProgress(i+1, r);
@@ -101,15 +100,18 @@ break;
 }
 
 }
+
+//Adds the single polygon ROI showing best symmetry to ROI manager
+
 selectWindow("Parent");
 roiManager("Add");
 close();
 close("Clear*");
 selectWindow("SUM_AOriginal");
 close();
-//Exits with single polygon ROI showing best symmetry.
 
-//Selects that ROI and applies it to stack
+//selects the best symmetry ROI and applies it for angle manipulation
+
 selectWindow("AOriginal");
 run("Select None");
 roiManager("Select", 0);
@@ -117,15 +119,17 @@ roiManager("Select", 0);
 
 //creates a polygon that obtains the angle at which the image will be rotated
 //so that the plane of symmetry is now horizontal
+//uses the polygon showing the best symmetry
+
 getSelectionCoordinates(xpoints, ypoints);
 makeSelection("angle",newArray(xpoints[1],xpoints[0],xpoints[2]), newArray(ypoints[1],ypoints[0],ypoints[0]));
 run("Measure");
 Poly_angle = getResult("Angle", 0);
 selectWindow("AOriginal");
 close();
-//works
 
 //converts angle into negative int. and rotates the image.
+
 nPoly_angle = 0 - Poly_angle;
 selectWindow("Original");
 run("Select None");
@@ -133,10 +137,11 @@ run("Rotate... ", "angle=nPoly_angle grid=1 interpolation=Bilinear enlarge stack
 run("Select None");
 run("Clear Results");
 
-//duplicate the layers and concatinate the images
+//duplicate the layers at midline and concatinates the images
+//corrects 3D drift and prompts you to save the resulting image
+
 close("ROI Manager");
 selectWindow("Original");
-
 makeRectangle(0, 0, getWidth(), (getHeight()/2));
 roiManager("Add");
 run("Duplicate...", "title=LeftNF duplicate");
@@ -152,20 +157,21 @@ run("Concatenate...", "  title=[Cat image] open image1=LeftNF image2=RightNF");
 selectWindow("Cat image");
 run("Correct 3D drift");
 close("Cat image");
-
 setBatchMode("show");
-
 waitForUser("Save this image as 'embryo' - registered time points");
+
+//selects a slice where the image should be visible
+//asks for you to apply a threshold to the images and removes the outliers
 
 setSlice(nSlices/4);
 run("Threshold...");
-waitForUser("Apply threshold to image - DO NOT CALCULATE FOR EACH IMAGE");
+waitForUser("Apply threshold to image", "Do not caculate threshold for each image, select Huang with Dark Background");
 setBatchMode("hide");
 run("Remove Outliers...", "radius=10 threshold=50 which=Bright stack");
 run("Remove Outliers...", "radius=10 threshold=50 which=Dark stack");
 
 
-//seperates the two registered neural folds and calculates the pixel distain from one half to the other
+//seperates the two registered neural folds and calculates the pixel distance from one half to the other
 
 run("Invert LUT");
 run("Duplicate...", "title=BothNF duplicate");
@@ -203,6 +209,9 @@ selectWindow("NF2-Edge");
 close();
 selectWindow("NF1-DM");
 close();
+
+//sums the two halves together
+
 imageCalculator("Add create 32-bit stack", "Result of Result of NF2","Result of Result of NF1");
 
 setBatchMode(false);
