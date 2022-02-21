@@ -1,8 +1,13 @@
-//Run witht wo binarized windows open labeleld Divergent and Overlap
-Dialog.create("User inputs");
-Dialog.addMessage("Define your parameters here.");
-#@ Integer (label="Sub-sampling ratio. 1 = Accurate, 10 = fast", min=1, max=10, value=2) SubS
+//Run with two binarized windows open labelled Divergent and Overlap
 
+Dialog.create("User inputs");
+Dialog.addSlider("Sub-sampling ratio - 1 = Accurate, 10 = fast:", 1, 10, 5);
+Dialog.show();
+SubS = Dialog.getNumber();
+selectWindow("Overlap");
+setBatchMode("hide");
+selectWindow("Divergent");
+setBatchMode("hide");
 run("Set Measurements...", "mean redirect=None decimal=1");
 run("Select All");
 run("Duplicate...", "title=Thickness");
@@ -32,8 +37,6 @@ Width = getWidth();
 Height = nSlices();
 newImage("Result", "8-bit black", Width, Height, 1);
 run("Fire");
-
-setBatchMode(true);
 
 setSlice(1);
 z = 1;
@@ -72,6 +75,7 @@ run("Add...", "value=Divergence");
 }
 
 
+selectWindow("Result");
 
 setBatchMode(false);
-selectWindow("Result");
+

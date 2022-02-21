@@ -1,16 +1,23 @@
 
 //Make sure important results and ROI's are saved and cleared
-//Z sum project of the shaved NE, creates seperate images to be manipulated
-run("Duplicate...", "title=Original duplicate");
+
+//Produces a Z sum project- oriented ZP on left, tail on right - of the shaved NE and creates seperate images to be manipulated
+
+setBatchMode("hide");
+run("Duplicate...", "title=Original duplicate"); //Original will be the main target for manipulation
 selectWindow("Original");
-run("Duplicate...", "title=AOriginal duplicate");
+run("Duplicate...", "title=AOriginal duplicate"); //This image will be used for the rotation calculation
 run("Z Project...", "projection=[Sum Slices]");
 run("Set Measurements...", "area redirect=None decimal=4");
 
-
 //Selection of Zippering point, returns the value into the next section
+//Makes sure the zippering point was selected
+
+setBatchMode("show");
 setTool("point");
 waitForUser("Point selection", "When a Zippering point is selected, Click 'OK'");
+setBatchMode("hide");
+
 s = selectionType();
 if( s == -1 ) {
     exit("There was no selection.");
@@ -23,21 +30,19 @@ if( s == -1 ) {
 setTool("multipoint");
 run("Select None");
 
-//In a SUM-projected image oriented ZP on left, tail on right
-//This Macro tessallates polygons from the ZP down the image and adds to ROI manager.
-By = 0;
+//This tessallates polygons from the ZP down the image and adds to ROI manager.
 
-setBatchMode(true);
+counts = 0;
 run("Set Measurements...", "mean redirect=None decimal=1");
-
-while(By < getHeight()) {
-	By = By+1;
-makePolygon(0,ZPY,getWidth(),By,getWidth(),0,0,0);
+while(counts < getHeight()) {
+	counts = counts+1;
+makePolygon(0,ZPY,getWidth(),counts,getWidth(),0,0,0);
 roiManager("Add");
 }
 
 
 //Duplicate images to clear inside and outside the polygon
+
 run("Duplicate...", "title=Parent");
 run("Duplicate...", "title=ClearIn");
 selectWindow("Parent");
@@ -46,6 +51,7 @@ run("Duplicate...", "title=ClearOut");
 
 //Check whether the area outside the polygon is larger than inside in each ROI. 
 //Stop when outside is smaller
+
 r = roiManager("count");
 for (i=0; i<r; i++) {
  	showProgress(i+1, r);
@@ -85,31 +91,37 @@ close();
 
 selectWindow("Parent");
 roiManager("Select", i);
-close("ROI Manager");
-close("Threshold");
 run("Clear Results");
-
+SelectSeq = Array.getSequence(i+1);
+roiManager("Select", SelectSeq);
+roiManager("Deselect");
+roiManager("Delete");
 break;
 }
 
 }
 
-setBatchMode(false);
+//Adds the single polygon ROI showing best symmetry to ROI manager
 
 selectWindow("Parent");
 roiManager("Add");
 close();
-
-//Exits with single polygon ROI showing best symmetry.
-
-//Selects that ROI and applies it to stack
-roiManager("Select", 0);
+close("Clear*");
+selectWindow("SUM_AOriginal");
 close();
+
+//selects the best symmetry ROI and applies it for angle manipulation
+
 selectWindow("AOriginal");
+run("Select None");
 roiManager("Select", 0);
+
+close("ROI Manager");
 
 //creates a polygon that obtains the angle at which the image will be rotated
 //so that the plane of symmetry is now horizontal
+//uses the polygon showing the best symmetry
+
 getSelectionCoordinates(xpoints, ypoints);
 makeSelection("angle",newArray(xpoints[1],xpoints[0],xpoints[2]), newArray(ypoints[1],ypoints[0],ypoints[0]));
 run("Measure");
@@ -117,22 +129,22 @@ Poly_angle = getResult("Angle", 0);
 selectWindow("AOriginal");
 close();
 
-
 //converts angle into negative int. and rotates the image.
+
 nPoly_angle = 0 - Poly_angle;
 selectWindow("Original");
+run("Select None");
 run("Rotate... ", "angle=nPoly_angle grid=1 interpolation=Bilinear enlarge stack");
 run("Select None");
 run("Clear Results");
-selectWindow("Original");
 
 
 //applies threshold with user adjustability
-setBatchMode(false);
+setBatchMode("show");
 setSlice(nSlices/2);
 run("Threshold...");
-waitForUser("Apply threshold to image");
-setBatchMode(true);
+waitForUser("Apply threshold to image", "Do not caculate threshold for each image, select Huang with Dark Background");
+setBatchMode("hide");
 
 //Duplicate images at midline to seperate neural folds
 close("ROI Manager");
@@ -147,7 +159,6 @@ close("ROI Manager");
 selectWindow("Original");
 close();
 
-
 //Invert Lut to allow for quick selection of folds, find the maximum area of the window
 //so that we do not include full-window selections
 run("Set Measurements...", "area redirect=None decimal=4");
@@ -160,13 +171,11 @@ run("Select None");
 run("Clear Results");
 run("Set Measurements...", "area redirect=None decimal=4");
 
-// assigning variables
-TotalLeftArea = 0;
-TotalRightArea = 0;
-
 //measure the area of suquential neural folds in the left NF after 
 //threshold has been applied, removing any blank splace values
 //repeat for right
+TotalLeftArea = 0;
+TotalRightArea = 0;
 
 for (n=1; n<=nSlices;n++){
 	setSlice(n);
@@ -204,7 +213,7 @@ for (n=1; n<=nSlices;n++){
 }
 close();
 run("Clear Results");
-setBatchMode(false);
+setBatchMode("exit and display");
 
 //sum the areas and times them by the voxel height
 //print total volumes for both neural folds 
