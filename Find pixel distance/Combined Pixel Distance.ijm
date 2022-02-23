@@ -214,5 +214,4 @@ close();
 
 imageCalculator("Add create 32-bit stack", "Result of Result of NF2","Result of Result of NF1");
 
-setBatchMode(false);
-selectWindow("Result of Result of Result of NF2");
+setBatchMode("exit and display");
