@@ -145,6 +145,9 @@ setSlice(nSlices/2);
 run("Threshold...");
 waitForUser("Apply threshold to image", "Do not caculate threshold for each image, select Huang with Dark Background");
 setBatchMode("hide");
+run("Remove Outliers...", "radius=10 threshold=50 which=Bright stack");
+run("Remove Outliers...", "radius=10 threshold=50 which=Dark stack");
+
 
 //Duplicate images at midline to seperate neural folds
 close("ROI Manager");
@@ -163,7 +166,7 @@ close();
 //so that we do not include full-window selections
 run("Set Measurements...", "area redirect=None decimal=4");
 selectWindow("LeftNF");
-run("Invert LUT");
+
 makeRectangle(0, 0, getWidth(), getHeight());
 run("Measure");
 Max_Area = getResult("Area", 0);
@@ -195,7 +198,7 @@ close();
 run("Clear Results");
 
 selectWindow("RightNF");
-run("Invert LUT");
+
 run("Set Measurements...", "area redirect=None decimal=4");
 for (n=1; n<=nSlices;n++){
 	setSlice(n);
@@ -218,9 +221,8 @@ setBatchMode("exit and display");
 //sum the areas and times them by the voxel height
 //print total volumes for both neural folds 
 getVoxelSize(width, height, depth, unit);
-print("The Left neural folds' volume is", TotalLeftArea*depth, "micrometres cubed");
-print("The Right neural folds' volume is", TotalRightArea*depth, "micrometres cubed");
-print("There is a difference of", abs((TotalLeftArea*height)-(TotalRightArea*height)), "micrometres cubed");
+print("Left NF volume:", TotalLeftArea*depth, "micrometres cubed");
+print("Right NF volume:", TotalRightArea*depth, "micrometres cubed");
 
 //The total volume of both L/R neural folds appear in your Log
 //along with the absolute value of one minus the other.

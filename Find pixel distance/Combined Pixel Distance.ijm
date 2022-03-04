@@ -221,13 +221,13 @@ rename("NF1 edge with NF2 DM");
 
 
 imageCalculator("Multiply create 32-bit stack", "NF2-pxEdge","NF1-DM");
-rename("NF2 edge with NF1 DM")
+rename("NF2 edge with NF1 DM");
 
 
 //sums the two halves together
 
 imageCalculator("Add create 32-bit stack", "NF2 edge with NF1 DM","NF1 edge with NF2 DM");
-rename("Result")
+rename("Result");
 selectWindow("NF1-pxEdge");
 run("Multiply...", "value=255 stack");
 selectWindow("NF2-pxEdge");
