@@ -1,17 +1,17 @@
 
-run("Duplicate...", "title=BothNF duplicate");
-run("Duplicate...", "title=NF1 duplicate frames=1");
-selectWindow("BothNF");
-run("Duplicate...", "title=NF2 duplicate frames=2");
+run("Duplicate...", "title=BothNFBS duplicate");
+run("Duplicate...", "title=NF1BS duplicate frames=1");
+selectWindow("BothNFBS");
+run("Duplicate...", "title=NF2BS duplicate frames=2");
 
 //flips orientation of first NF and Z projects
-selectWindow("BothNF");
+selectWindow("BothNFBS");
 run("Select All");	
 getSelectionCoordinates(xpoints, ypoints);
 Refx = xpoints[1];
 Refy = ypoints[2];
 run("Select None");
-selectWindow("NF1");
+selectWindow("NF1BS");
 run("Duplicate...", "title=NF1Alter duplicate");
 run("Flip Vertically");
 run("Z Project...", "projection=[Sum Slices]");
@@ -60,7 +60,7 @@ if (Commence == true) {
 };
 
 //repeat for channel2
-selectWindow("NF2");
+selectWindow("NF2BS");
 run("Select None");
 run("Duplicate...", "title=NF2Alter duplicate");
 run("Flip Vertically");
@@ -110,9 +110,8 @@ if (Commence == true) {
 
 run("Concatenate...", "  title=[Main] open image1=NF1Alter image2=NF2Alter");
 run("Flip Vertically");
-selectWindow("Main");
+selectWindow("Main"); 
+
 close("\\Others");
-run("Duplicate...", "title=BothNF duplicate");
-run("Duplicate...", "title=NF1 duplicate frames=1");
-selectWindow("BothNF");
-run("Duplicate...", "title=NF2 duplicate frames=2");
+rename("BothNF");
+
