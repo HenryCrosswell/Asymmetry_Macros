@@ -1,57 +1,36 @@
-
-//Make sure important results and ROI's are saved and cleared
-
-//Produces a Z sum project- oriented ZP on left, tail on right - of the shaved NE and creates seperate images to be manipulated
-
-setBatchMode("hide");
-run("Duplicate...", "title=Original duplicate"); //Original will be the main target for manipulation
-selectWindow("Original");
-run("Duplicate...", "title=AOriginal duplicate"); //This image will be used for the rotation calculation
+run("Duplicate...", "title=Original duplicate");
 run("Z Project...", "projection=[Sum Slices]");
-run("Set Measurements...", "area redirect=None decimal=4");
+rename("Parent");
 
-//Selection of Zippering point, returns the value into the next section
-//Makes sure the zippering point was selected
-
-setBatchMode("show");
 setTool("point");
 waitForUser("Point selection", "When a Zippering point is selected, Click 'OK'");
-setBatchMode("hide");
 
-s = selectionType();
-if( s == -1 ) {
-    exit("There was no selection.");
-} if( s != 10 ) {
-    exit("The selection wasn't a point selection.");
-} else {
-    getSelectionCoordinates(xPoints,yPoints);
-   ZPY = yPoints[0];
-}
-setTool("multipoint");
-run("Select None");
+getSelectionCoordinates(xPoints,yPoints);
+ZPY = yPoints[0];
 
-//This tessallates polygons from the ZP down the image and adds to ROI manager.
 
-counts = 0;
+By = 0;
+
+setBatchMode(true);
 run("Set Measurements...", "mean redirect=None decimal=1");
-while(counts < getHeight()) {
-	counts = counts+1;
-makePolygon(0,ZPY,getWidth(),counts,getWidth(),0,0,0);
+
+while(By < getHeight()) {
+	By = By+1;
+makePolygon(0,ZPY,getWidth(),By,getWidth(),0,0,0);
 roiManager("Add");
+
 }
 
 
 //Duplicate images to clear inside and outside the polygon
 
-run("Duplicate...", "title=Parent");
 run("Duplicate...", "title=ClearIn");
 selectWindow("Parent");
 run("Duplicate...", "title=ClearOut");
 
 
-//Check whether the area outside the polygon is larger than inside in each ROI. 
+//Check whether the binarised area outside the polygon is largger than inside in each ROI. 
 //Stop when outside is smaller
-
 r = roiManager("count");
 for (i=0; i<r; i++) {
  	showProgress(i+1, r);
@@ -91,56 +70,36 @@ close();
 
 selectWindow("Parent");
 roiManager("Select", i);
+close("ROI Manager");
+close("Threshold");
 run("Clear Results");
-SelectSeq = Array.getSequence(i+1);
-roiManager("Select", SelectSeq);
-roiManager("Deselect");
-roiManager("Delete");
+
 break;
 }
 
 }
 
-//Adds the single polygon ROI showing best symmetry to ROI manager
+setBatchMode(false);
 
 selectWindow("Parent");
 roiManager("Add");
 close();
-close("Clear*");
-selectWindow("SUM_AOriginal");
-close();
 
-//selects the best symmetry ROI and applies it for angle manipulation
-
-selectWindow("AOriginal");
-run("Select None");
-roiManager("Select", 0);
-close("ROI Manager");
-
-//creates a polygon that obtains the angle at which the image will be rotated
-//so that the plane of symmetry is now horizontal
-//uses the polygon showing the best symmetry
-
+//Exits with single polygon ROI showing best symmetry.
+roiManager("select", 0);
 getSelectionCoordinates(xpoints, ypoints);
-makeSelection("angle",newArray(xpoints[1],xpoints[0],xpoints[2]), newArray(ypoints[1],ypoints[0],ypoints[0]));
+Array.print(ypoints);
+run("Select None");
+makeLine(0, ypoints[0], getWidth(), ypoints[1]);
 run("Measure");
 Poly_angle = getResult("Angle", 0);
-selectWindow("AOriginal");
-close();
-
-//converts angle into negative int. and rotates the image.
-
-nPoly_angle = 0 - Poly_angle;
-selectWindow("Original");
-run("Select None");
-run("Rotate... ", "angle=nPoly_angle grid=1 interpolation=Bilinear enlarge stack");
-run("Select None");
+run("Rotate... ", "angle=Poly_angle grid=1 interpolation=Bilinear enlarge stack");
+roiManager("delete");
 run("Clear Results");
 
-//duplicate the layers at midline and concatinates the images
-//corrects 3D drift and prompts you to save the resulting image
 
-close("ROI Manager");
+
+
 selectWindow("Original");
 makeRectangle(0, 0, getWidth(), (getHeight()/2));
 roiManager("Add");
@@ -348,3 +307,8 @@ run("Multiply...", "value=255 stack");
 selectWindow("NF2-pxEdge");
 run("Multiply...", "value=255 stack");
 setBatchMode("exit and display");
+//selectWindow("Result");
+//setBatchMode(false);
+//run("Rotate 90 Degrees Left");
+//run("Z Project...", "projection=[Max Intensity]");
+

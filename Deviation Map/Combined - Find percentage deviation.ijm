@@ -13,10 +13,10 @@ run("Set Measurements...", "area redirect=None decimal=4");
 //Selection of Zippering point, returns the value into the next section
 //Makes sure the zippering point was selected
 
-setBatchMode("show");
+setBatchMode("exit and display");
 setTool("point");
 waitForUser("Point selection", "When a Zippering point is selected, Click 'OK'");
-setBatchMode("hide");
+setBatchMode(true);
 
 s = selectionType();
 if( s == -1 ) {
@@ -105,6 +105,9 @@ break;
 
 selectWindow("Parent");
 roiManager("Add");
+setBatchMode("exit and display");
+waitForUser;
+close("*");
 close();
 close("Clear*");
 selectWindow("SUM_AOriginal");
@@ -157,13 +160,13 @@ run("Flip Vertically");
 run("Concatenate...", "  title=[Cat image] open image1=LeftNF image2=RightNF");
 selectWindow("Cat image");
 run("Correct 3D drift");
-close("Cat image");
+
 setBatchMode("show");
 waitForUser("Save this image as 'embryo' - registered time points");
-
+close("Cat image");
 //selects a slice where the image should be visible
 //asks for you to apply a threshold to the images and removes the outliers
-
+setBatchMode("show");
 setSlice(nSlices/4);
 run("Threshold...");
 waitForUser("Apply threshold to image", "Do not caculate threshold for each image, select Huang with Dark Background");
@@ -214,15 +217,13 @@ selectWindow("BothNF");
 close();
 
 //Run with two binarized windows open labelled Divergent and Overlap
-
+setBatchMode("exit and display");
 Dialog.create("User inputs");
 Dialog.addSlider("Sub-sampling ratio - 1 = Accurate, 10 = fast:", 1, 10, 5);
 Dialog.show();
 SubS = Dialog.getNumber();
 selectWindow("Overlap");
-setBatchMode("hide");
 selectWindow("Divergent");
-setBatchMode("hide");
 run("Set Measurements...", "mean redirect=None decimal=1");
 run("Select All");
 run("Duplicate...", "title=Thickness");
@@ -293,5 +294,5 @@ run("Add...", "value=Divergence");
 
 selectWindow("Result");
 
-setBatchMode(false);
+
 

@@ -1,9 +1,11 @@
-i=0
-SubS = 1;
+while (nImages != 0) {
+
+i=0;
+SubS = 5;
 Lx = 1;
 y = 1;
 Rx = getWidth();
-SlideCoord = 0
+SlideCoord = 0;
 run("Clear Results");
 run("Set Measurements...", "mean redirect=None decimal=1");
 makeRectangle(Lx, y, Rx, SubS);
@@ -58,5 +60,17 @@ roiManager("Select", SelectSeq);
 roiManager("Delete");
 roiManager("count");
 roiManager("select", 0);
+//run("Crop");
 
+//run("Size...", "width=500 height=1800 depth=1 interpolation=Bilinear");
+run("Set Measurements...", "mean redirect=None decimal=1");
+run("Measure");
+run("Select None");
+roiManager("Delete");
+result = getResult("Mean", 0);
+print(getTitle);
+print(result);
+close();
+run("Clear Results");
 
+};
