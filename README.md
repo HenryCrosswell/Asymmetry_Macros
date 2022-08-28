@@ -1,31 +1,42 @@
+## __Overview__
+--------
+
+Custom ImageJ macros, for the quantification of both anterior and posterior neural folds (NFs) in mice.
+
 # Asymmetry_Macros
-Macros for ImageJ - towards the asymmetry project
+Disclaimer: These macros are to be used on confocal images, lower resolution could affect read-outs
+## Anterior neural fold quantification:
+These macros must be used after the anterior NFs have been vertically orientated
+- Find Area
+    - Finds the total area of a selected embryo
+- Find Maxima
+    - Used for counting mitotic cells - fluoresce with proliferative antibody before analysis
+    - Applys a median filter and finds maxima, to count pHH3 
+- Six selections - for both pHH3 and total cell count
+    - Make sure not to look at pHH3 layer prior to making selections
+    - apply six selections using the macro, then follow instructions
+- Area difference
+    - selects both NFs individually and measures their areas
+- Cfl1 quant
+    - select an area that fits within both left-right NF
+    - follow macros instructions
 
-To count pHH3 and calculate area of NFs
-1. open all three macros in this folder
-2. run "Duplicate for cell count"
-3. Run "find area" or " Find maxima" depending on which image is selected
-4. For area the entirety of the embryo should be selected, for pHH3 just the NE should be selected
-5. make sure the find maxima value is custom to each NF but still consistent between NF halves
-6. record Data in excel
+## Posterior neural fold quantification
+These macros must be used after the posterior NFs have been vertically orientated and surface sliced.
 
-To calculate the volume of each NF 
-1. run "Combined - volume V2"
+- Deletion quantification
+    - Used to measure Vangl2 deletion
+    - follow instructions in the macro
 
-To count individual selections pHH3 counts to calculate total cell counts in the future
-1. Duplicate embryo, rename - q - and turn off layer with pHH3 cells
-2. specify a selection box - 100x100
-3. save the ROI, move the box to a different area, save the ROI once again
-4. Repeat util you have 5 seperate, random ROI's
-5. run - duplication for square counts
-6. count individual cells with multi-point tool
-7. turn on pHH3 layer and count mitosing cells
-8. record data in excel
+- Deviation map
+    - Used to measure and visualise the percentage difference between overlapping and divergent volumes
+    - Three different methods depending on the images you have.
 
-To develop a heatmap of percentage deviation:
-1. Run "Combined - Find percentage deviation" on a shaved neural fold image
-2. Save resulting image (values represent percentage diversion)
+- Distance map
+    - Finds the voxel distances between left and right NFs
+    - Two different methods for different image types.
 
-To calculate difference in 3D pixel distance
-1. Run - Combined Pixel Distance on a shaved neural fold image
-2. ??????? extract values?
+- PNP select and quantification
+    - 1-100 selection maker, makes 1% selections across the PNP and measures pixel intensity
+    - Macro for outline, scans across the image until it hits a pixel, producing an outline
+    - Overall intensity uses the above macro and measures intensity
